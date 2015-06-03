@@ -1,0 +1,11 @@
+Package: samcleanR
+Type: Package
+Title: Cleans Strings
+Version: 0.1
+Date: 2015-06-03
+Author: Sam Bernecker
+Maintainer: Sam Bernecker <sberneck@psych.umass.edu>
+Description: This package was created to clean Sam's data.
+License: GPLv3
+LazyData: TRUE
+Imports: stringr
