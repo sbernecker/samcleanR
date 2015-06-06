@@ -3,11 +3,12 @@
 #' @param ... One or more lists that contain named data frames as their elements. Each list in my data set corresponds to a measurement occasion.
 #' @param subscales A character vector of the names of subscales that the user wants to compute, written so the names match those in the lookup list.
 #' @param lookupList A list object that contains scoring "instructions" for each subscale.
+#' @param writeToExcel A logical vector of length one that specifies whether the resulting data frame should be written to a new Excel file. Default is F. The file will be created in the current working directory.
 #' @param idxOfSubj The column index in the data frames that contains subject IDs. Default is 1.
 #' @return A data frame containing the requested subscale scores for each subject and occasion. That is, each subject gets a row, and each subscale-occasion combo gets its own column.
 #' @export
 
-megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1){
+megaScorer <- function(..., subscales, lookupList, writeToExcel = F, idxOfSubj = 1){
   #makes all of the lists of data frames into a list of lists of data frames (ouch!)
   occasions <- list(...)
   #gives each list the name of the list item as passed in, and also assigns this character vector to occasionNames
@@ -15,7 +16,7 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1){
 
   #creates a one-column data frame with just subject names ... it's not "big" yet but it will be!
   bigDf <- occasions[[1]][[1]][idxOfSubj]
-  #gets the character name of the subject column just in case it's something other than "Subjects"!
+  #gets the character name of the subject column just in case it's something other than "Subjects"
   subjChar <- names(bigDf)
 
   #loops through each of the subscales requested ...
@@ -56,6 +57,13 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1){
     }
   }
   return(bigDf)
+
+  if(writeToExcel = T){
+    #pastes together the names of the occassions and then the subscales in order, separated by underscores
+    filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_scored.xlsx", sep = "")
+    xlsx::write.xlsx(bigDf, file = filename, sheetName = "Scored", row.names = F, showNA = F)
+  }
+
 }
 
 
