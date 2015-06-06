@@ -26,11 +26,11 @@ megaMissingness <- function(..., subscales, lookupList, idxOfSubj = 1, writeToEx
 
     #... and gets the appropriate measure name and scoring information from the lookup table
     measName <- lookupList[[subscales[subsc]]]$measName
-    forwNames <- lookupList[[subscales[subsc]]]$forwNames
-    revNames <- lookupList[[subscales[subsc]]]$revNames
+    forwItems <- lookupList[[subscales[subsc]]]$forwItems
+    revItems <- lookupList[[subscales[subsc]]]$revItems
 
     #creates a character vector containing all items that are used to score the subscale (regardless of forward or reverse); removes NAs if they somehow ended up on there
-    allitems <- na.omit(c(forwNames, revNames))
+    allitems <- na.omit(c(forwItems, revItems))
 
         #tells the user which subscale is being checked
     cat("==== Now checking", subscales[subsc], " ====\n", sep = "")

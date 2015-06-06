@@ -1,7 +1,7 @@
 #' Reads in and cleans up the scoring lookup list.
 #'
 #'@param filename The location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.
-#'@return A list of lists, one list for each subscale, named with the subscale name and containing four sublists: measName, forwNames, revNames, and revInt.
+#'@return A list of lists, one list for each subscale, named with the subscale name and containing four sublists: measName, forwItems, revItems, and revInt.
 #'@export
 
 
@@ -27,13 +27,13 @@ getLookup <- function(filename, mystartrow = 1){
   for(i in 1:length(listList)){
     #makes measName the first element of measName
     listList[[i]]$measName <- listList[[i]]$measName[1]
-    #strips NAs off of forwNames
-    listList[[i]]$forwNames <- na.omit(listList[[i]]$forwNames)
-    #if the first element of revNames is NA, makes it an empty character vector; otherwise, strips off NAs
-    if(is.na(listList[[i]]$revNames[1])){
-      listList[[i]]$revNames <- character(length = 0L)
+    #strips NAs off of forwItems
+    listList[[i]]$forwItems <- na.omit(listList[[i]]$forwItems)
+    #if the first element of revItems is NA, makes it an empty character vector; otherwise, strips off NAs
+    if(is.na(listList[[i]]$revItems[1])){
+      listList[[i]]$revItems <- character(length = 0L)
     }else{
-      listList[[i]]$revNames <- na.omit(listList[[i]]$revNames)
+      listList[[i]]$revItems <- na.omit(listList[[i]]$revItems)
     }
     #if the first element of revInt is NA, makes it an empty numeric vector; otherwise, strips off NAs
     if(is.na(listList[[i]]$revInt[1])){

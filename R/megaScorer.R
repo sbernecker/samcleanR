@@ -25,8 +25,8 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel =
 
     #... and gets the appropriate measure names and scoring information from the lookup table
     measName <- lookupList[[subscales[subsc]]]$measName
-    forwNames <- lookupList[[subscales[subsc]]]$forwNames
-    revNames <- lookupList[[subscales[subsc]]]$revNames
+    forwItems <- lookupList[[subscales[subsc]]]$forwItems
+    revItems <- lookupList[[subscales[subsc]]]$revItems
     revInt <- lookupList[[subscales[subsc]]]$revInt
     #tells the user which subscale is being scored
     cat("==== Now scoring ", subscales[subsc], " ====\n", sep = "")
@@ -49,7 +49,7 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel =
         cat("Scoring", occasionNames[occ], subscales[subsc], "\n")
 
         #creates a two-column data frame with the subject IDs and the total scores
-        littleDf <- calcSubscale(occasions[[occ]][[measIdx]], forwNames = forwNames, revNames = revNames, revInt = revInt)
+        littleDf <- calcSubscale(occasions[[occ]][[measIdx]], forwItems = forwItems, revItems = revItems, revInt = revInt)
         #names the column containing the total score with the name of the subscale and the occasion
         colnames(littleDf)[2] <- paste(occasionNames[occ], subscales[subsc], sep = "_")
         #merges the new data frame with the previous data frame, by whatever name is given to subjects in these data sets (in my data sets it's just "Subject")
