@@ -1,0 +1,18 @@
+{
+    "contents" : "#' Computes the percentage of items that are missing for a given subject on a given subscale.\n#'\n#' @param itemvec A vector containing the items for which missingness is to be computed.\n#' @return The percent of items on the scale that are missing for that subject, rounded to two decimal places. 100 indicates that all items are missing, 0 indicates that no items are missing.\n#' @export\n\npercentMissing <- function(itemvec){\n  #calculates the proportion of the items in the vector that are\n  prcnt <- sum(is.na(itemvec))/length(itemvec)\n  #multiplies by 100 to transform proportion to percent, round to two decimal places\n  prcnt <- round(100*prcnt, digits = 2)\n  return(prcnt)\n}\n",
+    "created" : 1433600478259.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1587501307",
+    "id" : "3F39D199",
+    "lastKnownWriteTime" : 1433612441,
+    "path" : "~/research/samcleanR/R/percentMissing.R",
+    "project_path" : "R/percentMissing.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

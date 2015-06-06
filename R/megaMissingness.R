@@ -1,71 +1,78 @@
-#' Scores requested subscales from a given set of lists of data frames.
+#' Creates a data frame containing the percentage of items that are missing for a given set of subscales and measurement occasions for each subject.
 #'
 #' @param ... One or more lists that contain named data frames as their elements. Each list in my data set corresponds to a measurement occasion.
-#' @param subscales A character vector of the names of subscales that the user wants to compute, written so the names match those in the lookup list.
+#' @param subscales A character vector of the names of subscales for which the user wants to know missingness.
 #' @param lookupList A list object that contains scoring "instructions" for each subscale.
 #' @param idxOfSubj The column index in the data frames that contains subject IDs. Default is 1.
 #' @param writeToExcel A logical vector of length one that specifies whether the resulting data frame should be written to a new Excel file. Default is FALSE. The file will be created in the current working directory and named with occassion and subscale names and the word "scored."
 #' @param path The desired location at which to save the file. Default is the working directory.
-#' @return A data frame containing the requested subscale scores for each subject and occasion. That is, each subject gets a row, and each subscale-occasion combo gets its own column.
+
+#' @return A data frame containing the percentage of values that are missing for each subject and occasion. That is, each subject gets a row, and each subscale-occasion combo gets its own column.
 #' @export
 
-megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE, path = getwd()){
+megaMissingness <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE, path = getwd()){
   #makes all of the lists of data frames into a list of lists of data frames (ouch!)
   occasions <- list(...)
   #gives each list the name of the list item as passed in, and also assigns this character vector to occasionNames
   occasionNames <- names(occasions) <- as.character(substitute(list(...)))[-1L]
 
-  #creates a one-column data frame with just subject names ... it's not "big" yet but it will be!
-  bigDf <- occasions[[1]][[1]][idxOfSubj]
-  #gets the character name of the subject column just in case it's something other than "Subjects"
-  subjChar <- names(bigDf)
+  #creates a one-column data frame with just subject names ...
+  missingDf <- occasions[[1]][[1]][idxOfSubj]
+  #gets the character name of the subject column just in case it's something other than "Subjects"!
+  subjChar <- names(missingDf)
 
   #loops through each of the subscales requested ...
   for (subsc in 1:length(subscales)){
 
-    #... and gets the appropriate measure names and scoring information from the lookup table
+    #... and gets the appropriate measure name and scoring information from the lookup table
     measName <- lookupList[[subscales[subsc]]]$measName
     forwNames <- lookupList[[subscales[subsc]]]$forwNames
     revNames <- lookupList[[subscales[subsc]]]$revNames
-    revInt <- lookupList[[subscales[subsc]]]$revInt
-    #tells the user which subscale is being scored
-    cat("==== Now scoring ", subscales[subsc], " ====\n", sep = "")
 
-    #then, for each occasion, scores that subscale as follows.
+    #creates a character vector containing all items that are used to score the subscale (regardless of forward or reverse); removes NAs if they somehow ended up on there
+    allitems <- na.omit(c(forwNames, revNames))
+
+        #tells the user which subscale is being checked
+    cat("==== Now checking", subscales[subsc], " ====\n", sep = "")
+
+    #then, for each occasion, calculates missingness for that subscale as follows.
     for (occ in 1:length(occasions)){
-      #creates a vector of indices of the data frames in the current   occasion that match the measure needed for the current subscale
+      #creates a vector of indices of the data frames in the current occasion that match the measure needed for the current subscale
       measIdx <- grep(measName, names(occasions[[occ]]), ignore.case = T)
-
       if(length(measIdx) == 0){
-
         #if no data frames match, tells the user that the measure was not collected at the time point
         cat("The", measName, "was not collected at", occasionNames[occ], "\n")
       }else if (length(measIdx) > 1){
-
         #if there is more than one data frame that matches the measure name, warns the user that there might be an error and does not score the measure
-        warning(paste("There are", length(measIdx), "sheets that match", measName, "at", occasionNames[occ], ", so this measure at this occasion will not be scored.\n"))
+        warning(paste("There are", length(measIdx), "sheets that match", measName, "at", occasionNames[occ], ", so missingness at this occasion will not be computed.\n"))
       }else if (length(measIdx) == 1){
-        #tell the user what occasion is being scored
-        cat("Scoring", occasionNames[occ], subscales[subsc], "\n")
 
-        #creates a two-column data frame with the subject IDs and the total scores
-        littleDf <- calcSubscale(occasions[[occ]][[measIdx]], forwNames = forwNames, revNames = revNames, revInt = revInt)
-        #names the column containing the total score with the name of the subscale and the occasion
+        #tells the user what occasion is being computed
+        cat("Computing missingness at", occasionNames[occ], "for", subscales[subsc], "\n")
+
+        #creates a two-column data frame with the subject IDs and the missing percentages
+        littleDf <- calcPercentMissing(occasions[[occ]][[measIdx]], items = allitems)
+        #names the column containing the percent with the name of the subscale and the occasion
         colnames(littleDf)[2] <- paste(occasionNames[occ], subscales[subsc], sep = "_")
         #merges the new data frame with the previous data frame, by whatever name is given to subjects in these data sets (in my data sets it's just "Subject")
-        bigDf <- merge(bigDf, littleDf, by = subjChar, all = T, sort = F, suffixes = c("", occasionNames[occ]))
+        missingDf <- merge(missingDf, littleDf, by = subjChar, all = T, sort = F, suffixes = c("", occasionNames[occ]))
       }
     }
   }
 
   if(writeToExcel == T){
     #pastes together the names of the occassions and then the subscales in order, separated by underscores
-    filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_SCORED.xlsx", sep = "")
+    filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_MISSINGNESS.xlsx", sep = "")
     #pastes together the filename and the specified path at which to store the file; default is working directory
     totalpath <- paste(path, "/", filename, sep = "")
     #writes the data frame to an Excel file at the specified location
-    xlsx::write.xlsx(bigDf, file = totalpath, sheetName = "Scored", row.names = F, showNA = F)
+    xlsx::write.xlsx(missingDf, file = totalpath, sheetName = "Missing", row.names = F, showNA = F)
   }
 
-  return(bigDf)
+  return(missingDf)
 }
+
+
+
+
+

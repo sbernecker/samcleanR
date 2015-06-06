@@ -29,15 +29,15 @@ getLookup <- function(filename, mystartrow = 1){
     listList[[i]]$measName <- listList[[i]]$measName[1]
     #strips NAs off of forwNames
     listList[[i]]$forwNames <- na.omit(listList[[i]]$forwNames)
-    #if the first element of revNames is NA, makes it just one NA; otherwise, strips off NA values
+    #if the first element of revNames is NA, makes it an empty character vector; otherwise, strips off NAs
     if(is.na(listList[[i]]$revNames[1])){
-      listList[[i]]$revNames <- NA
+      listList[[i]]$revNames <- character(length = 0L)
     }else{
       listList[[i]]$revNames <- na.omit(listList[[i]]$revNames)
     }
-    #does the same with revInt
+    #if the first element of revInt is NA, makes it an empty numeric vector; otherwise, strips off NAs
     if(is.na(listList[[i]]$revInt[1])){
-      listList[[i]]$revInt <- NA
+      listList[[i]]$revInt <- numeric(length = 0L)
     }else{
       listList[[i]]$revInt <- na.omit(listList[[i]]$revInt)
     }
@@ -47,6 +47,3 @@ getLookup <- function(filename, mystartrow = 1){
 }
 
 # My lookup file is currently located at C:/Users/Sam/Documents/research/samcleanR/scoring_lookup.xlsx
-
-
-
