@@ -1,4 +1,4 @@
-#' Finds the proportion of values for each subject that are missing for a given set of subscales and measurement occasions.
+#' Creates a data frame containing the proportion of items that are missing for a given set of subscales and measurement occasions for each subject.
 #'
 #' @param ... One or more lists that contain named data frames as their elements. Each list in my data set corresponds to a measurement occasion.
 #' @param subscales A character vector of the names of subscales for which the user wants to know missingness.
@@ -61,3 +61,8 @@ getMissingness <- function(..., subscales, lookupList, idxOfSubj = 1){
   }
   return(bigDf)
 }
+
+
+
+
+

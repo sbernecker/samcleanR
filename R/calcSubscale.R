@@ -1,10 +1,10 @@
 #' This scores a given subscale and outputs a data frame with one column containing all subjects' scores.
 #'
-#' @param dataframe A data frame containing the appropriate measure items.
-#' @param fornames A character vector of the names of the items that should be forward-scored.
-#' @param revnames A character vector of the names of the items that should be reverse scored. Default is NULL in case there are no reverse-scored items.
-#' @param revint A numeric scalar that will be used to reverse score the reverse-scored items by subtracting the entered item value from the revint. For example, if the items are on a 1-7 Likert scale, the revint would be 8 (because 8-1 is 7, 8-7 is 1, etc.); if the items are on a 0-4 Likert scale, the revint would be 4. In general the revint is the maximum of the Likert scale if it starts at zero, or is 1 greater than the max if it starts at 1. Default is NULL in case there are no reverse scored items.
-#' @idxofsubj A numeric index giving the position in the original data frame that contains the subject IDs. Default is 1. If the subject IDs are the row names of the original data frame, change this to 0.
+#' @param dataFrame A data frame containing the appropriate measure items.
+#' @param forwNames A character vector of the names of the items that should be forward-scored.
+#' @param revNames A character vector of the names of the items that should be reverse scored. Default is NULL in case there are no reverse-scored items.
+#' @param revInt A numeric scalar that will be used to reverse score the reverse-scored items by subtracting the entered item value from the revint. For example, if the items are on a 1-7 Likert scale, the revint would be 8 (because 8-1 is 7, 8-7 is 1, etc.); if the items are on a 0-4 Likert scale, the revint would be 4. In general the revint is the maximum of the Likert scale if it starts at zero, or is 1 greater than the max if it starts at 1. Default is NULL in case there are no reverse scored items.
+#' @param idxofsubj A numeric index giving the position in the original data frame that contains the subject IDs. Default is 1. If the subject IDs are the row names of the original data frame, change this to 0.
 #' @return A data frame with two columns: one containing subject IDs, the other containing the scores for each subject.
 #' @export
 
