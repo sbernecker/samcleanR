@@ -6,10 +6,12 @@
 #' @param idxOfSubj The column index in the data frames that contains subject IDs. Default is 1.
 #' @param writeToExcel A logical vector of length one that specifies whether the resulting data frame should be written to a new Excel file. Default is FALSE. The file will be created in the current working directory and named with occassion and subscale names and the word "scored."
 #' @param path The desired location at which to save the file. Default is the working directory.
+#' @param meanSub Should item means be substituted before calculating the total? Default is FALSE.
+#' @param criterion A number indicating the maximum percent of items a subject can have missing in order to use mean substitution. Default is 50, but a warning is produced if the value is over 20 because there are more robust ways to deal with missing values than mean substitution!
 #' @return A data frame containing the requested subscale scores for each subject and occasion. That is, each subject gets a row, and each subscale-occasion combo gets its own column.
 #' @export
 
-megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE, path = getwd()){
+megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE, path = getwd(), meanSub = FALSE, criterion = 50){
   #makes all of the lists of data frames into a list of lists of data frames (ouch!)
   occasions <- list(...)
   #gives each list the name of the list item as passed in, and also assigns this character vector to occasionNames
@@ -48,6 +50,11 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel =
         #tell the user what occasion is being scored
         cat("Scoring", occasionNames[occ], subscales[subsc], "\n")
 
+        #if mean substitution requested, replaces the data frame with one in which item means are substituted for missing values (for those subjects that meet the missingness criterion)
+        if (meanSub){
+          occasions[[occ]][[measIdx]] <- meanSubstitute(occasions[[occ]][[measIdx]], forwItems = forwItems, revItems = revItems, revInt = revInt, criterion = criterion)
+        }
+
         #creates a two-column data frame with the subject IDs and the total scores
         littleDf <- calcSubscale(occasions[[occ]][[measIdx]], forwItems = forwItems, revItems = revItems, revInt = revInt)
         #names the column containing the total score with the name of the subscale and the occasion
@@ -59,8 +66,13 @@ megaScorer <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel =
   }
 
   if(writeToExcel == T){
-    #pastes together the names of the occassions and then the subscales in order, separated by underscores
-    filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_SCORED.xlsx", sep = "")
+    #pastes together the names of the occassions and then the subscales in order, separated by underscores; if mean sub requested, also includes the word MEANSUB and the criterion value
+    if (meanSub){
+      filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_SCORED_MEANSUB", criterion, ".xlsx", sep = "")
+    }else{
+          filename <- paste(paste(occasionNames, collapse = "_"), "_", paste(subscales, collapse = "_"), "_SCORED.xlsx", sep = "")
+    }
+
     #pastes together the filename and the specified path at which to store the file; default is working directory
     totalpath <- paste(path, "/", filename, sep = "")
     #writes the data frame to an Excel file at the specified location
