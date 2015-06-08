@@ -1,11 +1,12 @@
 #' Reads in and cleans up the scoring lookup list.
 #'
 #'@param filename The location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.
+#'@param myStartRow The row in the spreadshet that contains the headings.
 #'@return A list of lists, one list for each subscale, named with the subscale name and containing four sublists: measName, forwItems, revItems, and revInt.
 #'@export
 
 
-getLookup <- function(filename, mystartrow = 1){
+getLookup <- function(filename, myStartRow = 1){
   #reads in the workbook containing the scoring info as a "workbook" object
   wb <- xlsx::loadWorkbook(filename)
   #creates a character vector of all sheet names within the workbook, which correspond to the subscales that are listed in the lookup table
@@ -19,7 +20,7 @@ getLookup <- function(filename, mystartrow = 1){
   #loops through the subscales that are in the file ...
   for (i in 1:numSubsc){
     #... reads in a data frame containing the given sheet, and assigns the data frame to the list element with the corresponding subscale name
-    listList[[subscales[i]]] <- xlsx::read.xlsx(filename, sheetName = subscales[i], header = T, startRow = mystartrow, stringsAsFactors = F)
+    listList[[subscales[i]]] <- xlsx::read.xlsx(filename, sheetName = subscales[i], header = T, startRow = myStartRow, stringsAsFactors = F)
   }
   #transforms all data frames within the list into lists
   listList <- lapply(listList, as.list)
