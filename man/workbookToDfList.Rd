@@ -8,8 +8,6 @@ workbookToDfList(filename, mystartrow = 3)
 }
 \arguments{
 \item{filename}{The name/path of an Excel file (xls or xlsx)}
-
-\item{mystartrow}{The row containing the variable names (i.e., headings). Defaults to row 3 because that's what I need for this project!}
 }
 \value{
 A list of data frames, one for each sheet, with the name of the list element being the name of the sheet.

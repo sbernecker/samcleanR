@@ -4,17 +4,19 @@
 \alias{megaScorer}
 \title{Scores requested subscales from a given set of lists of data frames.}
 \usage{
-megaScorer(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE,
-  path = getwd(), meanSub = FALSE, criterion = 50)
+megaScorer(filenames, subscales, lookupList, idxOfSubj = 1, myStartRow = 3,
+  writeToExcel = FALSE, path = getwd(), meanSub = FALSE, criterion = 50)
 }
 \arguments{
-\item{...}{One or more lists that contain named data frames as their elements. Each list in my data set corresponds to a measurement occasion.}
+\item{filenames}{A list of Excel files that contain named spreadsheets.}
 
 \item{subscales}{A character vector of the names of subscales that the user wants to compute, written so the names match those in the lookup list.}
 
 \item{lookupList}{A list object that contains scoring "instructions" for each subscale.}
 
-\item{idxOfSubj}{The column index in the data frames that contains subject IDs. Default is 1.}
+\item{idxOfSubj}{The column index in the spreadsheets that contains subject IDs. Default is 1.}
+
+\item{myStartRow}{The row index in the spreadsheets containing the variable names (i.e., headings). Defaults to row 3 because that's what I need for this project!}
 
 \item{writeToExcel}{A logical vector of length one that specifies whether the resulting data frame should be written to a new Excel file. Default is FALSE. The file will be created in the current working directory and named with occassion and subscale names and the word "scored."}
 

@@ -2,17 +2,19 @@
 % Please edit documentation in R/getLookup.R
 \name{getLookup}
 \alias{getLookup}
-\title{Reads in and cleans up the scoring lookup list.}
+\title{Reads in and formats the scoring lookup list.}
 \usage{
-getLookup(filename, mystartrow = 1)
+getLookup(filename, myStartRow = 1)
 }
 \arguments{
-\item{filename}{The location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.}
+\item{filename}{The name/location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.}
+
+\item{myStartRow}{The row in the spreadsheet that contains the headings. Default is 1.}
 }
 \value{
-A list of lists, one list for each subscale, named with the subscale name and containing four sublists: measName, forwItems, revItems, and revInt.
+A list of lists, one list for each subscale. Each upperl-level list is named with the subscale name and contains four sublists: measName, forwItems, revItems, and revInt.
 }
 \description{
-Reads in and cleans up the scoring lookup list.
+Reads in and formats the scoring lookup list.
 }
 

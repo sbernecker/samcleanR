@@ -23,41 +23,62 @@ megaMissingness <- function(filenames, subscales, lookupList, idxOfSubj = 1, myS
 
   #loops through each of the subscales requested ...
   for (occ in 1:length(occasions)){
+#     wb <- XLConnect::loadWorkbook(filenames[occ])
+#     #creates a character vector of all sheet names within the workbook
+#     sheetNames <- XLConnect::getSheets(wb)
+#     #creates a character vector of the sheet names that do NOT contain the word "check"
+#     sheetNames <- grep("check", sheetNames, ignore.case = T, value = T, invert = T)
 
-    #... and gets the appropriate measure name and scoring information from the lookup table
-    measName <- lookupList[[subscales[subsc]]]$measName
-    forwItems <- lookupList[[subscales[subsc]]]$forwItems
-    revItems <- lookupList[[subscales[subsc]]]$revItems
-
-    #creates a character vector containing all items that are used to score the subscale (regardless of forward or reverse); removes NAs if they somehow ended up on there
-    allitems <- na.omit(c(forwItems, revItems))
+    wb <- XLConnect::loadWorkbook(filenames[occ])
+    #creates a character vector of all sheet names within the workbook
+    sheetNames <- XLConnect::getSheets(wb)
+    #creates a character vector of the sheet names that do NOT contain the word "check"
+    sheetNames <- grep("check", sheetNames, ignore.case = T, value = T, invert = T)
 
         #tells the user which subscale is being checked
-    cat("==== Now checking", subscales[subsc], " ====\n", sep = "")
+    cat("==== Now checking", occasionNames[occ], " ====\n", sep = "")
 
     #then, for each occasion, calculates missingness for that subscale as follows.
-    for (occ in 1:length(occasions)){
-      #creates a vector of indices of the data frames in the current occasion that match the measure needed for the current subscale
-      measIdx <- grep(measName, names(occasions[[occ]]), ignore.case = T)
+    for (subsc in 1:length(subscales)){
+      #... and gets the appropriate measure name and scoring information from the lookup table
+      measName <- lookupList[[subscales[subsc]]]$measName
+      forwItems <- lookupList[[subscales[subsc]]]$forwItems
+      revItems <- lookupList[[subscales[subsc]]]$revItems
+
+      #creates a character vector containing all items that are used to score the subscale (regardless of forward or reverse); removes NAs if they somehow ended up on there
+      allitems <- na.omit(c(forwItems, revItems))
+
+      #creates a vector of indices of the sheets in the current occasion that match the measure needed for the current subscale
+      measIdx <- grep(measName, sheetNames, ignore.case = T)
+
+      #if no sheets match, tells the user that the measure was not collected at the time point
       if(length(measIdx) == 0){
-        #if no data frames match, tells the user that the measure was not collected at the time point
         cat("The", measName, "was not collected at", occasionNames[occ], "\n")
+
+        #if there is more than one sheet that matches the measure name, warns the user that there might be an error and does not score the measure
       }else if (length(measIdx) > 1){
-        #if there is more than one data frame that matches the measure name, warns the user that there might be an error and does not score the measure
         warning(paste("There are", length(measIdx), "sheets that match", measName, "at", occasionNames[occ], ", so missingness at this occasion will not be computed.\n"))
+
+        #if there is one and only one sheet that matches the measure name, scores that subscale
       }else if (length(measIdx) == 1){
 
         #tells the user what occasion is being computed
         cat("Computing missingness at", occasionNames[occ], "for", subscales[subsc], "\n")
 
+        #read in the necessary sheet to a data frame
+        measDf <- XLConnect::readWorksheet(wb, sheet = measName, startRow = myStartRow)
+
         #creates a two-column data frame with the subject IDs and the missing percentages
-        littleDf <- calcPercentMissing(occasions[[occ]][[measIdx]], items = allitems)
+        littleDf <- calcPercentMissing(measDf, items = allitems)
         #names the column containing the percent with the name of the subscale and the occasion
         colnames(littleDf)[2] <- paste(occasionNames[occ], subscales[subsc], sep = "_")
         #merges the new data frame with the previous data frame, by whatever name is given to subjects in these data sets (in my data sets it's just "Subject")
         missingDf <- merge(missingDf, littleDf, by = subjChar, all = T, sort = F, suffixes = c("", occasionNames[occ]))
       }
     }
+
+    #once all of the subscales have been looped-over, removes the workbook to free up memory (I hope!)
+    rm(wb)
   }
 
   if(writeToExcel == T){
@@ -66,7 +87,7 @@ megaMissingness <- function(filenames, subscales, lookupList, idxOfSubj = 1, myS
     #pastes together the filename and the specified path at which to store the file; default is working directory
     totalpath <- paste(path, "/", filename, sep = "")
     #writes the data frame to an Excel file at the specified location
-    xlsx::write.xlsx(missingDf, file = totalpath, sheetName = "Missing", row.names = F, showNA = F)
+    XLConnect::writeWorksheetToFile(file = totalpath, data = missingDf, sheet = "Missing")
   }
 
   return(missingDf)
