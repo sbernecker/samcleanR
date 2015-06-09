@@ -23,37 +23,42 @@ megaScorer <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartR
   #gets the character name of the subject column just in case it's something other than "Subjects"
   subjChar <- names(bigDf)
 
-  #loops through each of the subscales requested ...
-  for (subsc in 1:length(subscales)){
+  #loops through each of the occassions requested ...
+  for (occ in 1:length(occasions)){
+    #reads in the workbook as a "workbook" object
+    wb <- XLConnect::loadWorkbook(filenames[occ])
+    #creates a character vector of all sheet names within the workbook
+    sheetNames <- XLConnect::getSheets(wb)
+    #creates a character vector of the sheet names that do NOT contain the word "check"
+    sheetNames <- grep("check", sheetNames, ignore.case = T, value = T, invert = T)
 
-    #... and gets the appropriate measure names and scoring information from the lookup table
-    measName <- lookupList[[subscales[subsc]]]$measName
-    forwItems <- lookupList[[subscales[subsc]]]$forwItems
-    revItems <- lookupList[[subscales[subsc]]]$revItems
-    revInt <- lookupList[[subscales[subsc]]]$revInt
-    #tells the user which subscale is being scored
-    cat("==== Now scoring ", subscales[subsc], " ====\n", sep = "")
+    #tell the user what occasion is being scored
+    cat("==== Now scoring ", occasionNames[occ], " ====\n", sep = "")
 
-    #then, for each occasion, scores that subscale as follows.
-    for (occ in 1:length(occasions)){
-      #reads in the workbook as a "workbook" object
-      wb <- XLConnect::loadWorkbook(filenames[occ])
-      #creates a character vector of all sheet names within the workbook
-      sheetNames <- XLConnect::getSheets(wb))
-      #creates a character vector of the sheet names that do NOT contain the word "check"
-      sheetNames <- grep("check", sheetNames, ignore.case = T, value = T, invert = T)
-      #creates a vector of indices of the data frames in the current occasion that match the measure needed for the current subscale
+    #then, for each subscale, scores it as follows.
+    for (subsc in 1:length(subscales)){
+
+      #gets the appropriate measure names and scoring information from the lookup table
+      measName <- lookupList[[subscales[subsc]]]$measName
+      forwItems <- lookupList[[subscales[subsc]]]$forwItems
+      revItems <- lookupList[[subscales[subsc]]]$revItems
+      revInt <- lookupList[[subscales[subsc]]]$revInt
+
+      #creates a vector of indices of the workbook sheets in the current occasion that match the measure needed for the current subscale
       measIdx <- grep(measName, sheetNames, ignore.case = T)
 
       #if no sheets match, tells the user that the measure was not collected at the time point
       if(length(measIdx) == 0){
-        cat("The", measName, "was not collected at", occasionNames[occ], "\n")
-      }else if (length(measIdx) > 1){
+        cat("The", subscales[subsc], "was not assessed for", occasionNames[occ], "\n")
 
         #if there is more than one sheet that matches the measure name, warns the user that there might be an error and does not score the measure
+      }else if (length(measIdx) > 1){
         warning(paste("There are", length(measIdx), "sheets that match", measName, "at", occasionNames[occ], ", so this measure at this occasion will not be scored.\n"))
+
+        #if there is one and only one sheet that matches the measure name, scores that subscale
       }else if (length(measIdx) == 1){
-        #tell the user what occasion is being scored
+
+        #tells the user which subscale is being scored
         cat("Scoring", occasionNames[occ], subscales[subsc], "\n")
 
         #read in the necessary sheet to a data frame
@@ -71,6 +76,9 @@ megaScorer <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartR
         bigDf <- merge(bigDf, littleDf, by = subjChar, all = T, sort = F, suffixes = c("", occasionNames[occ]))
       }
     }
+
+    #once all of the subscales have been looped-over, removes the workbook to free up memory (I hope!)
+    rm(wb)
   }
 
   if(writeToExcel == T){
@@ -84,7 +92,7 @@ megaScorer <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartR
     #pastes together the filename and the specified path at which to store the file; default is working directory
     totalpath <- paste(path, "/", filename, sep = "")
     #writes the data frame to an Excel file at the specified location
-    xlsx::write.xlsx(bigDf, file = totalpath, sheetName = "Scored", row.names = F, showNA = F)
+    XLConnect::writeWorksheetToFile(file = totalpath, data = bigDf, sheet = "Scored")
   }
 
   return(bigDf)

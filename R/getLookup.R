@@ -1,26 +1,24 @@
-#' Reads in and cleans up the scoring lookup list.
+#' Reads in and formats the scoring lookup list.
 #'
-#'@param filename The location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.
-#'@param myStartRow The row in the spreadshet that contains the headings.
-#'@return A list of lists, one list for each subscale, named with the subscale name and containing four sublists: measName, forwItems, revItems, and revInt.
+#'@param filename The name/location of the file containing the scoring lookup list. This function assumes that it is an Excel file formatted in a very specific way.
+#'@param myStartRow The row in the spreadsheet that contains the headings. Default is 1.
+#'@return A list of lists, one list for each subscale. Each upperl-level list is named with the subscale name and contains four sublists: measName, forwItems, revItems, and revInt.
 #'@export
 
 
 getLookup <- function(filename, myStartRow = 1){
   #reads in the workbook containing the scoring info as a "workbook" object
-  wb <- xlsx::loadWorkbook(filename)
+  wb <- XLConnect::loadWorkbook(filename)
   #creates a character vector of all sheet names within the workbook, which correspond to the subscales that are listed in the lookup table
-  subscales <- names(xlsx::getSheets(wb))
-  #gets the number of subscales
-  numSubsc <- length(subscales)
+  subscales <- XLConnect::getSheets(wb)
   #initializes an empty list into which to put the scoring info
   listList = list()
   #gives the list items the names of the subscales
   listList[subscales] <- list(NULL)
   #loops through the subscales that are in the file ...
-  for (i in 1:numSubsc){
+  for (i in 1:length(subscales)){
     #... reads in a data frame containing the given sheet, and assigns the data frame to the list element with the corresponding subscale name
-    listList[[subscales[i]]] <- xlsx::read.xlsx(filename, sheetName = subscales[i], header = T, startRow = myStartRow, stringsAsFactors = F)
+    listList[[subscales[i]]] <- XLConnect::readWorksheet(wb, sheet = subscales[i], header = T, startRow = myStartRow)
   }
   #transforms all data frames within the list into lists
   listList <- lapply(listList, as.list)
@@ -47,4 +45,4 @@ getLookup <- function(filename, myStartRow = 1){
   return(listList)
 }
 
-# My lookup file is currently located at C:/Users/Sam/Documents/research/samcleanR/scoring_lookup.xlsx
+# My lookup file is currently located at "C:/Users/Sam/Documents/research/samcleanR/scoring_lookup.xlsx"

@@ -1,11 +1,10 @@
 #' Substitutes a subject's item mean subscale score for missing values.
 #'
 #' @param dataFrame A data frame containing the subscale to be scored.
-#' @param dataFrame A data frame containing the appropriate measure items.
 #' @param forwItems A vector of the items that should be forward-scored.
 #' @param revItems A vector of the items that should be reverse scored. Default is NULL in case there are no reverse-scored items.
 #' @param revInt A number (usually an integer, but does not have to be integer type) that will be used to reverse score the reverse-scored items by subtracting the subject-entered item value from the revInt. Default is NULL in case there are no reverse scored items.
-#' @param criterion A number indicating the maximum percent of items a subject can have missing in order to use mean substitution. Default is 50, but a warning is produced if the value is over 20 because there are more robust ways to deal with missing values than mean substitution!
+#' @param criterion A number indicating the maximum percent of items a subject can have missing in order to use mean substitution. Default is 50, but a warning is produced if the value is over 20 because there are more robust ways to deal with missing values than mean substitution! Maximum is 100*((number of items - 1)/number of items). Round down just to be safe.
 #' @return A data frame in which the NAs have been replaced with the item means for the given subscale (only for the subjects that meet the criterion).
 #' @export
 
@@ -17,7 +16,7 @@ meanSubstitute <- function(dataFrame, forwItems, revItems = NULL, revInt = NULL,
   allitems <- na.omit(c(forwItems, revItems))
 
   #computes the maximum percent that can be missing without breaking the function: at least one item must be present for all subjects, or the function will break!
-  maxCriterion <- round(100*(length(allitems) - 1)/length(allitems), digits = 2)
+  maxCriterion <- (round(100*(length(allitems) - 1)/length(allitems), digits = 2)) - 0.01
   #throws an error if the criterion is over the maximum
   if(criterion >= maxCriterion) stop(paste("Cannot substitute a mean if all items are missing! For the current subscale, the criterion value must be below ", maxCriterion, ".", sep = ""))
   #gets a vector of rows indices in which less than or equal to the criterion percentage of the items are missing

@@ -1,28 +1,28 @@
 #' Creates a data frame containing the percentage of items that are missing for a given set of subscales and measurement occasions for each subject.
 #'
-#' @param ... One or more lists that contain named data frames as their elements. Each list in my data set corresponds to a measurement occasion.
+#' @param filenames A list of Excel files that contain named spreadsheets.
 #' @param subscales A character vector of the names of subscales for which the user wants to know missingness.
 #' @param lookupList A list object that contains scoring "instructions" for each subscale.
 #' @param idxOfSubj The column index in the data frames that contains subject IDs. Default is 1.
+#' @param myStartRow The row index in the spreadsheets containing the variable names (i.e., headings). Defaults to row 3 because that's what I need for this project!
 #' @param writeToExcel A logical vector of length one that specifies whether the resulting data frame should be written to a new Excel file. Default is FALSE. The file will be created in the current working directory and named with occassion and subscale names and the word "scored."
 #' @param path The desired location at which to save the file. Default is the working directory.
-
 #' @return A data frame containing the percentage of values that are missing for each subject and occasion. That is, each subject gets a row, and each subscale-occasion combo gets its own column.
 #' @export
 
-megaMissingness <- function(..., subscales, lookupList, idxOfSubj = 1, writeToExcel = FALSE, path = getwd()){
+megaMissingness <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartRow = 3, writeToExcel = FALSE, path = getwd()){
   #makes all of the lists of data frames into a list of lists of data frames (ouch!)
-  occasions <- list(...)
+  occasions <- filenames
   #gives each list the name of the list item as passed in, and also assigns this character vector to occasionNames
-  occasionNames <- names(occasions) <- as.character(substitute(list(...)))[-1L]
+  occasionNames <- sub(".xlsx", "", filenames)
 
   #creates a one-column data frame with just subject names ...
-  missingDf <- occasions[[1]][[1]][idxOfSubj]
+  missingDf <- XLConnect::readWorksheetFromFile(filenames[1], sheet = 1, startRow = myStartRow)[idxOfSubj]
   #gets the character name of the subject column just in case it's something other than "Subjects"!
   subjChar <- names(missingDf)
 
   #loops through each of the subscales requested ...
-  for (subsc in 1:length(subscales)){
+  for (occ in 1:length(occasions)){
 
     #... and gets the appropriate measure name and scoring information from the lookup table
     measName <- lookupList[[subscales[subsc]]]$measName
