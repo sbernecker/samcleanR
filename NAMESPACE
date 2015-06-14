@@ -2,6 +2,7 @@
 
 export(calcPercentMissing)
 export(calcSubscale)
+export(centerer)
 export(getLookup)
 export(meanSubstitute)
 export(megaMissingness)

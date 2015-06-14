@@ -23,7 +23,7 @@ megaScorer <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartR
   #gets the character name of the subject column just in case it's something other than "Subjects"
   subjChar <- names(bigDf)
 
-  #loops through each of the occassions requested ...
+    #loops through each of the occassions requested ...
   for (occ in 1:length(occasions)){
     #reads in the workbook as a "workbook" object
     wb <- XLConnect::loadWorkbook(filenames[occ])
@@ -72,6 +72,7 @@ megaScorer <- function(filenames, subscales, lookupList, idxOfSubj = 1, myStartR
         littleDf <- calcSubscale(measDf, forwItems = forwItems, revItems = revItems, revInt = revInt)
         #names the column containing the total score with the name of the subscale and the occasion
         colnames(littleDf)[2] <- paste(occasionNames[occ], subscales[subsc], sep = "_")
+  
         #merges the new data frame with the previous data frame, by whatever name is given to subjects in these data sets (in my data sets it's just "Subject")
         bigDf <- merge(bigDf, littleDf, by = subjChar, all = T, sort = F, suffixes = c("", occasionNames[occ]))
       }
