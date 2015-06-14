@@ -31,7 +31,7 @@ install.packages("devtools")
 library(devtools)
 install_github("sbernecker/samcleanR")
 ```
-Then, just call `library(samcleanR)` any time you want to use my functions. Alternatively, if you just want one or two functions, you could download the .R file into your working directory and `source` it when you want to use it, e.g., `source("centerer.R)`.
+Then, just call `library(samcleanR)` any time you want to use my functions. Alternatively, if you just want one or two functions, you could download the .R file into your working directory and `source` it when you want to use it, e.g., `source("centerer.R")`.
 
 To reshape data from wide to long and vice versa, you can use R's built-in function `reshape`. Other advice: RStudio and Google will hold your hand through this. 
 ***
