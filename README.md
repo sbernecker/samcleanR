@@ -31,9 +31,9 @@ install.packages("devtools")
 library(devtools)
 install_github("sbernecker/samcleanR")
 ```
-Then, just call `library(samcleanR)` any time you want to use my functions. To reshape data from wide to long and vice versa, you can use R's built-in function `reshape`. 
+Then, just call `library(samcleanR)` any time you want to use my functions. Alternatively, if you just want one or two functions, you could download the .R file into your working directory and `source` it when you want to use it, e.g., `source("centerer.R)`.
 
-Other advice: RStudio and Google will hold your hand through this. 
+To reshape data from wide to long and vice versa, you can use R's built-in function `reshape`. Other advice: RStudio and Google will hold your hand through this. 
 ***
 \*I've done this because I believe item-mean substitution is an acceptable way to deal with item-level missing data if it is minimal. After all, it's probably not going to introduce a lot of bias if you substitute a person's mean item score for a single missing item on a 15-item instrument. Multiple imputation (at least using the procedures I have tried) places too high a demand on memory to be feasible item-level missing data. My approach is to use item-level mean substitution when a few items are missing, but when several are missing, to use multiple imputation on total scores (or a statistical procedure that is robust to missing data). 
 
